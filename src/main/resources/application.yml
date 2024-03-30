@@ -1,0 +1,23 @@
+spring:
+  cloud:
+    gateway:
+      httpclient:
+        pool:
+#          感觉没啥用处，因为gateway默认就是使用netty，netty的连接池默认就是最大连接数为2048
+          max-connections: 2048
+          # 动态调节链接
+          type: elastic
+      routes:
+        - id: college-order-center
+          uri: lb://order-center
+          predicates: # 路径断言
+            - Path=/app-api/**
+server:
+  port: 48080
+
+reactor:
+  netty:
+#    增加工作线程，提高吞吐量，需要预热
+    ioWorkerCount: 64
+
+
