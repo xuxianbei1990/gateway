@@ -11,6 +11,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 /**
  * User: EDY
  * Date: 2024/3/30
@@ -20,6 +22,9 @@ import reactor.core.publisher.Mono;
 @Slf4j
 @Component
 public class AccessLogFilter implements GlobalFilter, Ordered {
+
+    private AtomicInteger counter = new AtomicInteger(0);
+
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
         ServerHttpRequest request = exchange.getRequest();
@@ -28,7 +33,7 @@ public class AccessLogFilter implements GlobalFilter, Ordered {
         AccessLog gatewayLog = new AccessLog();
         gatewayLog.setRequestMethod(request.getMethod().name());
         gatewayLog.setRequestUrl(request.getURI().getRawPath());
-        log.info("[writeAccessLog][网关日志：{}]", JSONObject.toJSONString(gatewayLog));
+        log.info("[writeAccessLog][网关日志：{}][统计器：{}]", JSONObject.toJSONString(gatewayLog), counter.incrementAndGet());
         return chain.filter(exchange);
     }
 
